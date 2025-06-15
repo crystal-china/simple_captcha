@@ -1,22 +1,30 @@
-# captcha
+# SimpleCaptcha
 
-TODO: Write a description here
+Crystal library that generates image CAPTCHAs, use numbers.
+
+For how to use this shard, check another shard [captcha](https://github.com/crystal-china/captcha).
+
+These two libraries should be interchangeable without the need to change you code.
+
+The differnt is:
+
+- SimpleCaptcha has no external dependencies other than Crystal，so, you can 
+  built static binary (if this is your's need)
+- this shard captcha code only support number.
 
 ## Installation
 
-TODO: Write installation instructions here
+1. Add the dependency to your `shard.yml`:
 
-## Usage
-
-TODO: Write usage instructions here
-
-## Development
-
-TODO: Write development instructions here
+   ```yaml
+   dependencies:
+     captcha:
+       github: crystal-china/simple_captcha
+   ```
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/captcha/fork>)
+1. Fork it (<https://github.com/crystal-china/simple_captcha/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -24,4 +32,6 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [Sunrise](https://github.com/your-github-user) - creator and maintainer
+- [Sunrise](https://github.com/yanecc) - creator and maintainer
+- [Billy.Zheng](https://github.com/zw963) - maintainer
+
