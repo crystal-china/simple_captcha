@@ -1,0 +1,16 @@
+name: captcha
+version: 0.1.0
+
+authors:
+  - Sunrise <yane@88.com>
+
+targets:
+  captcha:
+    main: src/captcha.cr
+dependencies:
+  stumpy_png:
+    github: stumpycr/stumpy_png
+
+crystal: ">= 1.16.2"
+
+license: MIT
