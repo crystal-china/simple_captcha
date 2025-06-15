@@ -1,10 +1,12 @@
 # SimpleCaptcha
 
+![](images/captcha.png)
+
 Crystal library that generates image CAPTCHAs, use numbers.
 
 All credits goes to @yanecc
 
-For how to use this shard, check another shard [captcha](https://github.com/crystal-china/captcha).
+For how to use this shard, check the sisiter shard [captcha](https://github.com/crystal-china/captcha).
 
 These two libraries should be interchangeable without the need to change you code.
 
