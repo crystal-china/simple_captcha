@@ -18,7 +18,7 @@ The differnt is:
 
    ```yaml
    dependencies:
-     captcha:
+     simple_captcha:
        github: crystal-china/simple_captcha
    ```
 
