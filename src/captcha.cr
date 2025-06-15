@@ -296,6 +296,3 @@ HEREDOC
     end
   end
 end
-
-captcha = CaptchaGenerator.new
-# captcha.save_captcha("captcha.png")
