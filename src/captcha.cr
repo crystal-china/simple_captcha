@@ -151,35 +151,48 @@ end
 class CaptchaGenerator
   getter code : String
   @io : IO::Memory
+  @width : Int32
+  @height : Int32
 
   def initialize(code : String? = nil, length : Int32 = 4)
     code = (0...length).map { Random.rand(10).to_s }.join if code.nil?
     @code = code
 
-    @width = 200
-    @height = 80
+    # 验证码数字宽度
+    digit_width = 40
+    # 验证码数字高度约为56像素 (7*8)
+    digit_height = 56
+
+    @width = digit_width * length + 50
+    @height = digit_height + 20
     @font = SimpleFont.new
     @format = "png"
 
-    canvas = StumpyPNG::Canvas.new(@width, @height)
+    canvas = StumpyPNG::Canvas.new(
+      width: @width,
+      height: @height
+    )
 
     # 设置背景色为白色
     (0...@width).each do |x|
       (0...@height).each do |y|
-        canvas[x, y] = StumpyCore::RGBA.new(UInt16::MAX, UInt16::MAX, UInt16::MAX, UInt16::MAX)
+        canvas[x, y] = StumpyCore::RGBA.new(
+          r: UInt16::MAX,
+          g: UInt16::MAX,
+          b: UInt16::MAX,
+          a: UInt16::MAX
+        )
       end
     end
 
     # 添加噪点
     add_noise(canvas)
 
-    # 绘制验证码数字
-    digit_width = 40
     start_x = (@width - code.size * digit_width) // 2
 
     code.each_char_with_index do |digit, index|
       x = start_x + index * digit_width
-      y = (@height - 56) // 2 # 字符高度约为56像素 (7*8)
+      y = (@height - 56) // 2
 
       # 添加随机偏移
       offset_x = Random.rand(-5..5)
