@@ -2,7 +2,7 @@ require "stumpy_png"
 require "stumpy_core"
 
 class SimpleFont
-  def initialize(@font_path : String)
+  def initialize
   end
 
   # 简化的数字位图，每个数字用7x5的点阵表示
@@ -99,9 +99,47 @@ class SimpleFont
     ],
   }
 
+  COLORS = [
+    StumpyCore::RGBA::GAINSBORO,
+    StumpyCore::RGBA::LIGHTGREY,
+    StumpyCore::RGBA::SILVER,
+    StumpyCore::RGBA::WHITESMOKE,
+    StumpyCore::RGBA::LIGHTCYAN,
+    StumpyCore::RGBA::ALICEBLUE,
+    StumpyCore::RGBA::AZURE,
+    StumpyCore::RGBA::POWDERBLUE,
+    StumpyCore::RGBA::LIGHTBLUE,
+    StumpyCore::RGBA::MISTYROSE,
+    StumpyCore::RGBA::PINK,
+    StumpyCore::RGBA::LIGHTPINK,
+    StumpyCore::RGBA::LAVENDERBLUSH,
+    StumpyCore::RGBA::LAVENDER,
+    StumpyCore::RGBA::THISTLE,
+    StumpyCore::RGBA::PLUM,
+    StumpyCore::RGBA::HONEYDEW,
+    StumpyCore::RGBA::PALEGREEN,
+    StumpyCore::RGBA::MINTCREAM,
+    StumpyCore::RGBA::AQUAMARINE,
+    StumpyCore::RGBA::LIGHTYELLOW,
+    StumpyCore::RGBA::LEMONCHIFFON,
+    StumpyCore::RGBA::BEIGE,
+    StumpyCore::RGBA::CORNSILK,
+    StumpyCore::RGBA::OLDLACE,
+    StumpyCore::RGBA::FLORALWHITE,
+    StumpyCore::RGBA::IVORY,
+    StumpyCore::RGBA::SEASHELL,
+    StumpyCore::RGBA::ANTIQUEWHITE,
+    StumpyCore::RGBA::BLANCHEDALMOND,
+    StumpyCore::RGBA::BISQUE,
+    StumpyCore::RGBA::PEACHPUFF,
+  ]
+
   def draw_digit(canvas, digit : Char, x : Int32, y : Int32, scale : Int32 = 8)
     pattern = DIGIT_PATTERNS[digit]
+
     return unless pattern
+
+    color = COLORS.sample
 
     pattern.each_with_index do |row, row_idx|
       row.each_with_index do |pixel, col_idx|
@@ -112,7 +150,7 @@ class SimpleFont
               px = x + col_idx * scale + dx
               py = y + row_idx * scale + dy
               if px >= 0 && px < canvas.width && py >= 0 && py < canvas.height
-                canvas[px, py] = StumpyCore::RGBA.new(0_u16, 0_u16, 0_u16, UInt16::MAX)
+                canvas[px, py] = color
               end
             end
           end
@@ -123,15 +161,18 @@ class SimpleFont
 end
 
 class CaptchaGenerator
-  def initialize(@width = 200, @height = 80)
-    @font = SimpleFont.new("Fonts/arial.ttf")
-  end
+  getter code : String
+  @io : IO::Memory
 
-  def generate_code(length = 4) : String
-    (0...length).map { Random.rand(10).to_s }.join
-  end
+  def initialize(code : String? = nil, length : Int32 = 4)
+    code = (0...length).map { Random.rand(10).to_s }.join if code.nil?
+    @code = code
 
-  def create_captcha(code : String) : StumpyPNG::Canvas
+    @width = 200
+    @height = 80
+    @font = SimpleFont.new
+    @format = "png"
+
     canvas = StumpyPNG::Canvas.new(@width, @height)
 
     # 设置背景色为白色
@@ -162,7 +203,52 @@ class CaptchaGenerator
     # 添加干扰线
     add_interference_lines(canvas)
 
-    canvas
+    # canvas
+    @io = IO::Memory.new
+    StumpyPNG.write(canvas, @io)
+    @io.rewind
+  end
+
+  def base64
+    @base64 ||= Base64.encode(@io.gets_to_end)
+  end
+
+  def img_tag(width : String? = nil, height : String? = nil) : String
+    String.build do |io|
+      io << <<-HEREDOC
+<img src="data:image/#{@format};base64,#{base64}"
+HEREDOC
+
+      if width && height
+        io << " style=\"width: #{width}; height: #{height};\""
+      elsif width
+        io << " style=\"width: #{width};\""
+      elsif height
+        io << " style=\"height: #{height};\""
+      end
+
+      io << " />"
+    end
+  end
+
+  def write_html_file(name) : Nil
+    html = <<-HEREDOC
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 Image Demo</title>
+  </head>
+
+  <body>
+    <h1>Show captcha image</h1>
+    #{img_tag}
+  </body>
+</html>
+HEREDOC
+
+    File.write(name, html)
   end
 
   private def add_noise(canvas)
@@ -209,16 +295,7 @@ class CaptchaGenerator
       y += y_increment
     end
   end
-
-  def save_captcha(filename : String)
-    code = generate_code
-    canvas = create_captcha(code)
-    StumpyPNG.write(canvas, filename)
-    puts "验证码: #{code}"
-    puts "图片已保存至: #{filename}"
-    code
-  end
 end
 
 captcha = CaptchaGenerator.new
-captcha.save_captcha("captcha.png")
+# captcha.save_captcha("captcha.png")
