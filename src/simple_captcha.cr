@@ -1,6 +1,6 @@
 require "stumpy_png"
 require "stumpy_core"
-require "./captcha/simple_font"
+require "./simple_captcha/simple_font"
 
 class CaptchaGenerator
   getter code : String

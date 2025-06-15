@@ -24,6 +24,8 @@ The different is:
        github: crystal-china/simple_captcha
    ```
 
+2. require "simple_captcha"
+
 ## Contributing
 
 1. Fork it (<https://github.com/crystal-china/simple_captcha/fork>)
